@@ -38,22 +38,27 @@ function App() {
   const [calculation, setCalculation] = useState(null);
   const [currency, setCurrency] = useState('BRL');
   const [dollarRate, setDollarRate] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [stateSearch, setStateSearch] = useState('');
+  const [showStateOptions, setShowStateOptions] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Filtra os estados baseado na busca
+  const filteredStates = Object.entries(states).filter(([uf, { name }]) => {
+    const searchTerm = stateSearch.toLowerCase();
+    return name.toLowerCase().includes(searchTerm) || uf.toLowerCase().includes(searchTerm);
+  });
+
   useEffect(() => {
-    if (!isDropdownOpen) return;
+    if (!showStateOptions) return;
 
     const handleOutsideClick = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        // Pequeno delay para mobile para não interferir com scroll
         setTimeout(() => {
-          setIsDropdownOpen(false);
+          setShowStateOptions(false);
         }, 100);
       }
     };
 
-    // Só adiciona o listener após um pequeno delay para evitar fechar imediatamente
     const timeoutId = setTimeout(() => {
       document.addEventListener('mousedown', handleOutsideClick);
       document.addEventListener('touchstart', handleOutsideClick);
@@ -64,11 +69,28 @@ function App() {
       document.removeEventListener('mousedown', handleOutsideClick);
       document.removeEventListener('touchstart', handleOutsideClick);
     };
-  }, [isDropdownOpen]);
+  }, [showStateOptions]);
 
   const handleStateSelect = (uf) => {
     setSelectedState(uf);
-    setIsDropdownOpen(false);
+    setStateSearch(states[uf].name);
+    setShowStateOptions(false);
+  };
+
+  const handleStateSearchChange = (e) => {
+    const value = e.target.value;
+    setStateSearch(value);
+    setShowStateOptions(value.length > 0);
+    
+    // Se o valor digitado corresponder exatamente a um estado, seleciona automaticamente
+    const exactMatch = Object.entries(states).find(([uf, { name }]) => 
+      name.toLowerCase() === value.toLowerCase()
+    );
+    if (exactMatch) {
+      setSelectedState(exactMatch[0]);
+    } else {
+      setSelectedState('');
+    }
   };
 
   const calculateTaxes = () => {
@@ -186,20 +208,18 @@ function App() {
           <div className="form-group" ref={dropdownRef}>
             <label htmlFor="state">Estado</label>
             <div className="custom-select-container">
-              <button
-                type="button"
-                className="custom-select-button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                onTouchEnd={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                <span>
-                  {selectedState ? states[selectedState].name : 'Selecione um estado...'}
-                </span>
-                <span className="custom-select-arrow">▼</span>
-              </button>
-              {isDropdownOpen && (
+              <input
+                type="text"
+                id="state"
+                className="form-control"
+                placeholder="Digite o nome do estado..."
+                value={stateSearch}
+                onChange={handleStateSearchChange}
+                onFocus={() => setShowStateOptions(stateSearch.length > 0)}
+              />
+              {showStateOptions && filteredStates.length > 0 && (
                 <div className="custom-select-options">
-                  {Object.entries(states).map(([uf, { name, icms }]) => (
+                  {filteredStates.map(([uf, { name }]) => (
                     <div
                       key={uf}
                       className="custom-select-option"
@@ -208,7 +228,7 @@ function App() {
                     >
                       {name}
                       <span className="icms-badge-custom">
-                        {Math.round(icms * 100)}% ICMS
+                        {Math.round(states[uf].icms * 100)}% ICMS
                       </span>
                     </div>
                   ))}
