@@ -44,32 +44,27 @@ function App() {
   useEffect(() => {
     if (!isDropdownOpen) return;
 
-    const isScrolling = { current: false };
-
-    const handleTouchMove = () => {
-      isScrolling.current = true;
-    };
-
-    const handleClickOrTouch = (event) => {
-      if (isScrolling.current) {
-        isScrolling.current = false;
-        return;
-      }
+    const handleOutsideClick = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+        // Pequeno delay para mobile para não interferir com scroll
+        setTimeout(() => {
+          setIsDropdownOpen(false);
+        }, 100);
       }
     };
 
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('mousedown', handleClickOrTouch);
-    document.addEventListener('touchend', handleClickOrTouch);
+    // Só adiciona o listener após um pequeno delay para evitar fechar imediatamente
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick);
+    }, 200);
 
     return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('mousedown', handleClickOrTouch);
-      document.removeEventListener('touchend', handleClickOrTouch);
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
     };
-  }, [isDropdownOpen, dropdownRef]);
+  }, [isDropdownOpen]);
 
   const handleStateSelect = (uf) => {
     setSelectedState(uf);
