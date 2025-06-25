@@ -43,13 +43,21 @@ function App() {
 
   // Fecha o dropdown se clicar fora
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+    const listener = (event) => {
+      // Não faz nada se o clique for no elemento do ref ou em seus descendentes
+      if (!dropdownRef.current || dropdownRef.current.contains(event.target)) {
+        return;
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+      setIsDropdownOpen(false);
+    };
+
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
   }, [dropdownRef]);
 
   const handleStateSelect = (uf) => {
