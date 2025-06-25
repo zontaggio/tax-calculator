@@ -41,24 +41,35 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Fecha o dropdown se clicar fora
   useEffect(() => {
-    const listener = (event) => {
-      // Não faz nada se o clique for no elemento do ref ou em seus descendentes
-      if (!dropdownRef.current || dropdownRef.current.contains(event.target)) {
+    if (!isDropdownOpen) return;
+
+    const isScrolling = { current: false };
+
+    const handleTouchMove = () => {
+      isScrolling.current = true;
+    };
+
+    const handleClickOrTouch = (event) => {
+      if (isScrolling.current) {
+        isScrolling.current = false;
         return;
       }
-      setIsDropdownOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
     };
 
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchend', listener);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('mousedown', handleClickOrTouch);
+    document.addEventListener('touchend', handleClickOrTouch);
 
     return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchend', listener);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('mousedown', handleClickOrTouch);
+      document.removeEventListener('touchend', handleClickOrTouch);
     };
-  }, [dropdownRef]);
+  }, [isDropdownOpen, dropdownRef]);
 
   const handleStateSelect = (uf) => {
     setSelectedState(uf);
