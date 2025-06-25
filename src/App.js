@@ -147,7 +147,7 @@ function App() {
                 className="form-control"
                 placeholder="0,00"
                 value={productValue}
-                onChange={(e) => setProductValue(e.target.value)}
+                onChange={(e) => setProductValue(e.target.value.replace(',', '.'))}
               />
             </div>
           </div>
@@ -162,7 +162,7 @@ function App() {
                   className="form-control"
                   placeholder="0,00"
                   value={dollarRate}
-                  onChange={(e) => setDollarRate(e.target.value)}
+                  onChange={(e) => setDollarRate(e.target.value.replace(',', '.'))}
                 />
               </div>
             </div>
