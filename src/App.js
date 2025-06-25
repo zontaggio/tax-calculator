@@ -93,10 +93,11 @@ function App() {
     });
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('pt-BR', {
+  const formatCurrency = (value, currencyCode = 'BRL') => {
+    const locale = currencyCode === 'USD' ? 'en-US' : 'pt-BR';
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'BRL',
+      currency: currencyCode,
     }).format(value);
   };
 
@@ -104,7 +105,7 @@ function App() {
     <div className="app">
       <div className="calculator-container">
         <header className="header">
-          <img src="/logo-dark.svg" alt="Logo" className="header-logo" />
+          <img src="https://importinghub.app/assets/images/logo-dark.svg" alt="Logo" className="header-logo" />
           <h1>
             Calculadora de Impostos de Importação
           </h1>
@@ -123,12 +124,14 @@ function App() {
               <button
                 className={`toggle-btn ${currency === 'BRL' ? 'active' : ''}`}
                 onClick={() => setCurrency('BRL')}
+                onTouchEnd={() => setCurrency('BRL')}
               >
                 BRL (R$)
               </button>
               <button
                 className={`toggle-btn ${currency === 'USD' ? 'active' : ''}`}
                 onClick={() => setCurrency('USD')}
+                onTouchEnd={() => setCurrency('USD')}
               >
                 USD ($)
               </button>
@@ -171,6 +174,7 @@ function App() {
                 type="button"
                 className="custom-select-button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onTouchEnd={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <span>
                   {selectedState ? states[selectedState].name : 'Selecione um estado...'}
@@ -184,6 +188,7 @@ function App() {
                       key={uf}
                       className="custom-select-option"
                       onClick={() => handleStateSelect(uf)}
+                      onTouchEnd={() => handleStateSelect(uf)}
                     >
                       {name}
                       <span className="icms-badge-custom">
@@ -195,7 +200,7 @@ function App() {
               )}
             </div>
           </div>
-          <button className="calculate-btn" onClick={calculateTaxes}>
+          <button className="calculate-btn" onClick={calculateTaxes} onTouchEnd={calculateTaxes}>
             Calcular Impostos
           </button>
         </section>
@@ -205,7 +210,7 @@ function App() {
             <section className="results-section">
               <div className="result-row">
                 <span className="result-label">Valor do Produto</span>
-                <span className="result-value">{formatCurrency(calculation.valorOriginal)}</span>
+                <span className="result-value">{formatCurrency(calculation.valorOriginal, currency)}</span>
               </div>
               <div className="result-row">
                 <span className="result-label">Impostos</span>
