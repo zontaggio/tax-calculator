@@ -36,7 +36,6 @@ function App() {
   const [productValue, setProductValue] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [calculation, setCalculation] = useState(null);
-  const [currency, setCurrency] = useState('BRL');
   const [dollarRate, setDollarRate] = useState('');
   const [stateSearch, setStateSearch] = useState('');
   const [showStateOptions, setShowStateOptions] = useState(false);
@@ -100,12 +99,12 @@ function App() {
       return;
     }
     
-    if (currency === 'USD' && (isNaN(parseFloat(dollarRate)) || parseFloat(dollarRate) <= 0)) {
+    if (isNaN(parseFloat(dollarRate)) || parseFloat(dollarRate) <= 0) {
       setCalculation(null);
       return;
     }
 
-    const rate = currency === 'USD' ? parseFloat(dollarRate) : 1;
+    const rate = parseFloat(dollarRate);
     const valorAduaneiro = value * rate;
     const aliquotaII = 0.60;
     const impostoImportacao = valorAduaneiro * aliquotaII;
@@ -155,28 +154,9 @@ function App() {
 
         <section className="input-section">
           <div className="form-group">
-            <label>Moeda</label>
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${currency === 'BRL' ? 'active' : ''}`}
-                onClick={() => setCurrency('BRL')}
-                onTouchEnd={() => setCurrency('BRL')}
-              >
-                BRL (R$)
-              </button>
-              <button
-                className={`toggle-btn ${currency === 'USD' ? 'active' : ''}`}
-                onClick={() => setCurrency('USD')}
-                onTouchEnd={() => setCurrency('USD')}
-              >
-                USD ($)
-              </button>
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="productValue">Valor do Produto</label>
+            <label htmlFor="productValue">Valor Declarado do Produto</label>
             <div className="input-wrapper">
-              <span>{currency === 'BRL' ? 'R$' : '$'}</span>
+              <span>$</span>
               <input
                 type="text"
                 inputMode="decimal"
@@ -188,23 +168,21 @@ function App() {
               />
             </div>
           </div>
-          {currency === 'USD' && (
-            <div className="form-group">
-              <label htmlFor="dollarRate">Cotação do Dólar</label>
-              <div className="input-wrapper">
-                <span>R$</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  id="dollarRate"
-                  className="form-control"
-                  placeholder="0,00"
-                  value={dollarRate}
-                  onChange={(e) => setDollarRate(e.target.value.replace(',', '.'))}
-                />
-              </div>
+          <div className="form-group">
+            <label htmlFor="dollarRate">Cotação do Dólar</label>
+            <div className="input-wrapper">
+              <span>R$</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                id="dollarRate"
+                className="form-control"
+                placeholder="0,00"
+                value={dollarRate}
+                onChange={(e) => setDollarRate(e.target.value.replace(',', '.'))}
+              />
             </div>
-          )}
+          </div>
           <div className="form-group" ref={dropdownRef}>
             <label htmlFor="state">Estado</label>
             <div className="custom-select-container">
@@ -245,8 +223,8 @@ function App() {
           <>
             <section className="results-section">
               <div className="result-row">
-                <span className="result-label">Valor do Produto</span>
-                <span className="result-value">{formatCurrency(calculation.valorOriginal, currency)}</span>
+                <span className="result-label">Valor Declarado do Produto</span>
+                <span className="result-value">{formatCurrency(calculation.valorOriginal, 'USD')}</span>
               </div>
               <div className="result-row">
                 <span className="result-label">Impostos</span>
@@ -267,8 +245,8 @@ function App() {
             </section>
             
             <section className="total-section">
-                <span className="result-label">Total a Pagar:</span>
-                <span className="result-value">{formatCurrency(calculation.totalAPagar)}</span>
+                <span className="result-label">Total de Impostos:</span>
+                <span className="result-value">{formatCurrency(calculation.totalImpostos)}</span>
             </section>
           </>
         )}
