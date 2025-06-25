@@ -142,7 +142,8 @@ function App() {
             <div className="input-wrapper">
               <span>{currency === 'BRL' ? 'R$' : '$'}</span>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 id="productValue"
                 className="form-control"
                 placeholder="0,00"
@@ -157,7 +158,8 @@ function App() {
               <div className="input-wrapper">
                 <span>R$</span>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   id="dollarRate"
                   className="form-control"
                   placeholder="0,00"
