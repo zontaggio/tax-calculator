@@ -108,6 +108,11 @@
   position: relative;
 }
 
+.custom-select-container .form-control {
+  padding: 14px;
+  padding-left: 14px !important;
+}
+
 .custom-select-button {
   background-color: #1E293B;
   border: 1px solid #334155;
